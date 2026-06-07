@@ -42,12 +42,38 @@ def search_recipes():
     import pandas as pd
     df = pd.read_pickle('data/cleaned_recipes.pkl')
 
-    # Simple search by name
-    mask = df['name'].str.contains(query.lower(), case=False, na=False)
-    results = df[mask].head(limit)
+    query_words = query.lower().split()
+    
+    # Search in name first
+    name_mask = df['name'].str.contains(query.lower(), case=False, na=False)
+    name_results = df[name_mask].head(limit)
+
+    # If not enough results search in ingredients and tags
+    if len(name_results) < 3:
+        combined_results = []
+        for word in query_words:
+            # Search in tags
+            tag_mask = df['tags'].apply(
+                lambda tags: any(word in tag.lower() for tag in tags)
+            )
+            tag_results = df[tag_mask].head(limit)
+            combined_results.append(tag_results)
+            
+            # Search in ingredients
+            ing_mask = df['ingredients'].apply(
+                lambda ings: any(word in ing.lower() for ing in ings)
+            )
+            ing_results = df[ing_mask].head(limit)
+            combined_results.append(ing_results)
+
+        import pandas as pd
+        all_results = pd.concat([name_results] + combined_results)
+        all_results = all_results.drop_duplicates(subset=['id']).head(limit)
+    else:
+        all_results = name_results
 
     recipes = []
-    for _, row in results.iterrows():
+    for _, row in all_results.iterrows():
         recipes.append({
             'id': int(row['id']),
             'name': row['name'],
@@ -62,7 +88,6 @@ def search_recipes():
         'count': len(recipes),
         'results': recipes
     })
-
 # ── TF-IDF similar recipes ──
 @app.route('/api/recommend/similar/<int:recipe_id>')
 def similar_recipes(recipe_id):
@@ -121,6 +146,37 @@ def hybrid_recipes(recipe_id):
         'kmeans_results': results['algorithms']['kmeans'],
         'collaborative_results': results['algorithms']['collaborative'],
         'hybrid_recommendations': results['hybrid_recommendations']
+    })
+@app.route('/api/recipes/<int:recipe_id>')
+def get_recipe(recipe_id):
+    import pandas as pd
+    import ast
+    df = pd.read_pickle('data/cleaned_recipes.pkl')
+    recipe = df[df['id'] == recipe_id]
+    
+    if len(recipe) == 0:
+        return jsonify({'error': 'Recipe not found'}), 404
+    
+    row = recipe.iloc[0]
+
+    steps = row['steps']
+    if isinstance(steps, str):
+        try:
+            steps = ast.literal_eval(steps)
+        except:
+            steps = [steps]
+    elif not isinstance(steps, list):
+        steps = []
+
+    return jsonify({
+        'id': int(row['id']),
+        'name': row['name'],
+        'ingredients': row['ingredients'],
+        'minutes': int(row['minutes']),
+        'n_steps': int(row['n_steps']),
+        'steps': steps,
+        'tags': row['tags'],
+        'description': row['description']
     })
 
 if __name__ == '__main__':

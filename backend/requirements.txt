@@ -1,0 +1,8 @@
+Access Key
+16kHENYV6kqWcd7b0tcpm5JC60UHJ1ExdsgwWKHgp8c
+
+Secret Key
+D0xk8-zHGsj5Lbp07rkO-jyRG5ixSOLwFPIHyDbKfAs
+
+ Application ID
+971589
