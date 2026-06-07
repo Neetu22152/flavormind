@@ -3,3 +3,6 @@ __pycache__/
 *.csv
 *.pyc
 .env
+*.pkl
+backend/data/
+backend/saved_models/
