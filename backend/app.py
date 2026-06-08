@@ -162,7 +162,6 @@ def hybrid_recipes(recipe_id):
     })
 @app.route('/api/recipes/<int:recipe_id>')
 def get_recipe(recipe_id):
-    import pandas as pd
     import ast
     df = pd.read_pickle('data/cleaned_recipes.pkl')
     recipe = df[df['id'] == recipe_id]
@@ -191,9 +190,8 @@ def get_recipe(recipe_id):
         'tags': row['tags'],
         'description': row['description']
     })
-    import json
-import os
 
+# ── Reviews ──
 REVIEWS_FILE = 'data/reviews.json'
 
 def load_reviews():
@@ -235,10 +233,8 @@ def add_review(recipe_id):
     if key not in reviews:
         reviews[key] = []
 
-    # Check if user already reviewed
     existing = next((r for r in reviews[key] if r['user_email'] == data.get('user_email')), None)
     if existing:
-        # Update existing review
         existing['rating'] = data['rating']
         existing['comment'] = data.get('comment', '')
         existing['updated'] = True
