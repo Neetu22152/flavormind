@@ -39,5 +39,5 @@ def download_models():
     
     print("All model files ready!")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     download_models()
