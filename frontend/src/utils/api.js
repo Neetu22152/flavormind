@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const BASE_URL = 'http://flavormind-api-9ui9.onrender.com'
+const BASE_URL = 'https://flavormind-api-9ui9.onrender.com'
 const UNSPLASH_KEY = '16kHENYV6kqWcd7b0tcpm5JC60UHJ1ExdsgwWKHgp8c'
 
 export const searchRecipes = async (query) => {
