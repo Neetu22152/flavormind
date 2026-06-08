@@ -2,7 +2,7 @@ import os
 from huggingface_hub import hf_hub_download
 from pathlib import Path
 
-REPO_ID = "neetu-dev/flavormind-models"
+REPO_ID = "neetu-ml/flavormind-models"
 
 FILES = [
     "saved_models/tfidf_vectorizer.pkl",
