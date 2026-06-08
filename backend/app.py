@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-
+import json
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -131,21 +131,32 @@ def hybrid_recipes(recipe_id):
     if user_id:
         user_id = int(user_id)
 
-    results = get_hybrid_recommendations(
-        recipe_id=recipe_id,
-        user_id=user_id,
-        top_n=top_n
-    )
+    # Get results from each algorithm
+    tfidf_results = get_similar_recipes(recipe_id, top_n=top_n)
+    kmeans_results = get_cluster_recommendations(recipe_id, top_n=top_n)
+    collaborative_results = get_collaborative_recommendations(user_id, top_n=top_n) if user_id else []
+
+    # Merge and deduplicate for hybrid recommendations
+    seen_ids = set()
+    hybrid = []
+    for source in [tfidf_results, kmeans_results.get('recommendations', []), collaborative_results]:
+        for recipe in source:
+            rid = recipe.get('id')
+            if rid and rid not in seen_ids and rid != recipe_id:
+                seen_ids.add(rid)
+                hybrid.append(recipe)
 
     return jsonify({
         'recipe_id': recipe_id,
         'user_id': user_id,
         'algorithm': 'Hybrid (TF-IDF + K-Means + SVD)',
-        'cluster_label': results.get('cluster_label', ''),
-        'tfidf_results': results['algorithms']['tfidf'],
-        'kmeans_results': results['algorithms']['kmeans'],
-        'collaborative_results': results['algorithms']['collaborative'],
-        'hybrid_recommendations': results['hybrid_recommendations']
+        'cluster_label': kmeans_results.get('cluster_label', ''),
+        'algorithms': {
+            'tfidf': tfidf_results,
+            'kmeans': kmeans_results.get('recommendations', []),
+            'collaborative': collaborative_results
+        },
+        'hybrid_recommendations': hybrid[:top_n]
     })
 @app.route('/api/recipes/<int:recipe_id>')
 def get_recipe(recipe_id):
@@ -178,6 +189,68 @@ def get_recipe(recipe_id):
         'tags': row['tags'],
         'description': row['description']
     })
+    import json
+import os
+
+REVIEWS_FILE = 'data/reviews.json'
+
+def load_reviews():
+    if os.path.exists(REVIEWS_FILE):
+        try:
+            with open(REVIEWS_FILE, 'r') as f:
+                content = f.read().strip()
+                if not content:
+                    return {}
+                return json.loads(content)
+        except:
+            return {}
+    return {}
+
+def save_reviews(reviews):
+    with open(REVIEWS_FILE, 'w') as f:
+        json.dump(reviews, f)
+
+@app.route('/api/reviews/<int:recipe_id>', methods=['GET'])
+def get_reviews(recipe_id):
+    reviews = load_reviews()
+    recipe_reviews = reviews.get(str(recipe_id), [])
+    avg = round(sum(r['rating'] for r in recipe_reviews) / len(recipe_reviews), 1) if recipe_reviews else None
+    return jsonify({
+        'recipe_id': recipe_id,
+        'reviews': recipe_reviews,
+        'avg_rating': avg,
+        'count': len(recipe_reviews)
+    })
+
+@app.route('/api/reviews/<int:recipe_id>', methods=['POST'])
+def add_review(recipe_id):
+    data = request.get_json()
+    if not data or not data.get('rating') or not data.get('user_name'):
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    reviews = load_reviews()
+    key = str(recipe_id)
+    if key not in reviews:
+        reviews[key] = []
+
+    # Check if user already reviewed
+    existing = next((r for r in reviews[key] if r['user_email'] == data.get('user_email')), None)
+    if existing:
+        # Update existing review
+        existing['rating'] = data['rating']
+        existing['comment'] = data.get('comment', '')
+        existing['updated'] = True
+    else:
+        reviews[key].append({
+            'user_name': data['user_name'],
+            'user_email': data.get('user_email', ''),
+            'rating': data['rating'],
+            'comment': data.get('comment', ''),
+            'date': data.get('date', '')
+        })
+
+    save_reviews(reviews)
+    return jsonify({'success': True})
 
 if __name__ == '__main__':
     print("Starting FlavorMind API...")

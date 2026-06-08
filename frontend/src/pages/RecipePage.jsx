@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getSimilarRecipes, getHybridRecipes, getFoodImage, getRecipeById } from '../utils/api'
 import RecipeCard from '../components/RecipeCard'
+import ReviewSection from '../components/ReviewSection'
 
 export default function RecipePage() {
   const { id } = useParams()
@@ -157,6 +158,8 @@ export default function RecipePage() {
           </div>
         </div>
       )}
+      {/* Reviews */}
+          <ReviewSection recipeId={parseInt(id)} />
     </div>
   )
 }
