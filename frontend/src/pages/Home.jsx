@@ -80,7 +80,7 @@ export default function Home() {
     setLoading(true)
     setSearched(true)
     try {
-      let url = 'http://flavormind-api-9ui9.onrender.com/api/recipes/search?q=' + searchQuery
+      let url = 'http://localhost:5000/api/recipes/search?q=' + searchQuery
       if (filter.max_minutes) url += '&max_minutes=' + filter.max_minutes
       if (filter.max_ingredients) url += '&max_ingredients=' + filter.max_ingredients
       if (dietTag) url += '&tag=' + dietTag
