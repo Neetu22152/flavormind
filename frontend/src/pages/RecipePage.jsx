@@ -14,29 +14,36 @@ export default function RecipePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true)
-      try {
-        // Get actual recipe details
-        const recipeData = await getRecipeById(parseInt(id))
-        setRecipe(recipeData)
+  setLoading(true)
+  try {
+    // Always get recipe details first
+    const recipeData = await getRecipeById(parseInt(id))
+    setRecipe(recipeData)
 
-        // Get food image using recipe name
-        const img = await getFoodImage(recipeData.name + ' food dish')
-        setImage(img)
+    const img = await getFoodImage(recipeData.name + ' food dish')
+    setImage(img)
 
-        // Get similar recipes
-        const similarData = await getSimilarRecipes(parseInt(id))
-        setSimilar(similarData.recommendations || [])
-
-        // Get hybrid recommendations
-        const hybridData = await getHybridRecipes(parseInt(id))
-        setHybrid(hybridData.hybrid_recommendations || [])
-
-      } catch (err) {
-        console.error(err)
-      }
-      setLoading(false)
+    // Try similar recipes — might fail if not in model
+    try {
+      const similarData = await getSimilarRecipes(parseInt(id))
+      setSimilar(similarData.recommendations || [])
+    } catch (err) {
+      console.log('Similar recipes not available for this recipe')
     }
+
+    // Try hybrid recommendations — might fail if not in model
+    try {
+      const hybridData = await getHybridRecipes(parseInt(id))
+      setHybrid(hybridData.hybrid_recommendations || [])
+    } catch (err) {
+      console.log('Hybrid recommendations not available for this recipe')
+    }
+
+  } catch (err) {
+    console.error(err)
+  }
+  setLoading(false)
+}
     fetchData()
   }, [id])
 
