@@ -11,8 +11,6 @@ import pickle
 from models.tfidf_model import get_similar_recipes
 from models.kmeans_model import get_cluster_recommendations
 from models.collaborative_model import get_collaborative_recommendations
-from download_models import download_models
-download_models()
 
 
 app = Flask(__name__)
