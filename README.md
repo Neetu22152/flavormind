@@ -1,10 +1,10 @@
-# 🍽️ FlavorMind — Smart Recipe Recommendation System
+#  FlavorMind — Smart Recipe Recommendation System
 
 FlavorMind is a full-stack web application that helps users discover recipes they'll love through personalized recommendations, smart search, and community reviews.
 
 ---
 
-## 🌟 Features
+##  Features
 
 - *Personalized Recommendations* — Get recipe suggestions based on your taste and what similar users enjoy
 - *Smart Search* — Search 229,000+ recipes by dish name, ingredient, or cuisine with filters for cooking time and dietary preferences
@@ -16,7 +16,7 @@ FlavorMind is a full-stack web application that helps users discover recipes the
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 *Backend*
 - Python 3.12
@@ -37,7 +37,7 @@ FlavorMind is a full-stack web application that helps users discover recipes the
 
 ---
 
-## 🤖 How Recommendations Work
+##  How Recommendations Work
 
 FlavorMind uses three recommendation approaches working together:
 
@@ -55,7 +55,7 @@ Combines all three approaches with weighted scoring (40% collaborative + 40% con
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Python 3.10+
@@ -104,7 +104,7 @@ Frontend runs at http://localhost:5173
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 
 flavormind/
@@ -130,7 +130,7 @@ flavormind/
 
 ---
 
-## 📡 API Endpoints
+##  API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -145,7 +145,7 @@ flavormind/
 
 ---
 
-## 📊 Model Performance
+## Model Performance
 
 | Model | Metric | Score |
 |-------|--------|-------|
@@ -156,7 +156,7 @@ flavormind/
 
 ---
 
-## 🙏 Acknowledgements
+##  Acknowledgements
 
 - [Food.com Dataset](https://www.kaggle.com/datasets/shuyangli94/food-com-recipes-and-user-interactions) by Shuyang Li on Kaggle
 - [Unsplash](https://unsplash.com/developers) for food photography API
