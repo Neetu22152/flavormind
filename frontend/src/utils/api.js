@@ -51,3 +51,43 @@ export const getRecipeById = async (recipeId) => {
   const res = await axios.get(BASE_URL + '/api/recipes/' + recipeId)
   return res.data
 }
+// ── User Dashboard APIs ──
+export const getSavedRecipes = async (email) => {
+  const res = await axios.get(BASE_URL + '/api/user/saved?email=' + email)
+  return res.data
+}
+
+export const saveRecipe = async (email, recipeId) => {
+  const res = await axios.post(BASE_URL + '/api/user/saved', { email, recipe_id: recipeId })
+  return res.data
+}
+
+export const unsaveRecipe = async (email, recipeId) => {
+  const res = await axios.delete(BASE_URL + '/api/user/saved', { data: { email, recipe_id: recipeId } })
+  return res.data
+}
+
+export const getMyRecipes = async (email) => {
+  const res = await axios.get(BASE_URL + '/api/user/recipes?email=' + email)
+  return res.data
+}
+
+export const uploadRecipe = async (email, recipe) => {
+  const res = await axios.post(BASE_URL + '/api/user/recipes', { email, ...recipe })
+  return res.data
+}
+
+export const deleteMyRecipe = async (email, recipeId) => {
+  const res = await axios.delete(BASE_URL + '/api/user/recipes/' + recipeId + '?email=' + email)
+  return res.data
+}
+
+export const editMyRecipe = async (email, recipeId, recipe) => {
+  const res = await axios.put(BASE_URL + '/api/user/recipes/' + recipeId, { email, ...recipe })
+  return res.data
+}
+
+export const updateProfile = async (email, data) => {
+  const res = await axios.put(BASE_URL + '/api/user/profile', { email, ...data })
+  return res.data
+}

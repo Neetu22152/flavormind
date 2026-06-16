@@ -7,6 +7,8 @@ import PersonalPage from './pages/PersonalPage'
 import LoginPage from './pages/LoginPage'
 import LandingPage from './pages/LandingPage'
 import Navbar from './components/Navbar'
+import DashboardPage from './pages/DashboardPage'
+import AdminPage from './pages/AdminPage'
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth()
@@ -33,6 +35,8 @@ function AppRoutes() {
         <Route path="/explore" element={<ProtectedRoute><ExplorePage /></ProtectedRoute>} />
         <Route path="/personal" element={<ProtectedRoute><PersonalPage /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardPage/> </ProtectedRoute>}/>
+        <Route path="/admin" element={<AdminPage />}/>
       </Routes>
     </div>
   )

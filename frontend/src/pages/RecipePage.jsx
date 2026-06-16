@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom'
 import { getSimilarRecipes, getHybridRecipes, getFoodImage, getRecipeById } from '../utils/api'
 import RecipeCard from '../components/RecipeCard'
 import ReviewSection from '../components/ReviewSection'
+import { saveRecipe, unsaveRecipe } from '../utils/api'
+import { useAuth } from '../context/AuthContext'
 
 export default function RecipePage() {
   const { id } = useParams()
@@ -11,13 +13,14 @@ export default function RecipePage() {
   const [hybrid, setHybrid] = useState([])
   const [image, setImage] = useState(null)
   const [loading, setLoading] = useState(true)
-
+  const [saved, setSaved] = useState(false)
+  const { user } = useAuth()
   useEffect(() => {
     const fetchData = async () => {
   setLoading(true)
   try {
     // Always get recipe details first
-    const recipeData = await getRecipeById(parseInt(id))
+    const recipeData = await getRecipeById((id))
     setRecipe(recipeData)
 
     const img = await getFoodImage(recipeData.name + ' food dish')
@@ -25,7 +28,7 @@ export default function RecipePage() {
 
     // Try similar recipes — might fail if not in model
     try {
-      const similarData = await getSimilarRecipes(parseInt(id))
+      const similarData = await getSimilarRecipes((id))
       setSimilar(similarData.recommendations || [])
     } catch (err) {
       console.log('Similar recipes not available for this recipe')
@@ -33,7 +36,7 @@ export default function RecipePage() {
 
     // Try hybrid recommendations — might fail if not in model
     try {
-      const hybridData = await getHybridRecipes(parseInt(id))
+      const hybridData = await getHybridRecipes((id))
       setHybrid(hybridData.hybrid_recommendations || [])
     } catch (err) {
       console.log('Hybrid recommendations not available for this recipe')
@@ -78,6 +81,15 @@ export default function RecipePage() {
         }
         <div className="recipe-hero-body">
           <h1 style={{textTransform:'capitalize'}}>{recipe.name}</h1>
+          {recipe.is_user_recipe && (
+  <div style={{
+    display:'inline-block', background:'#dcfce7', color:'#16a34a',
+    padding:'4px 12px', borderRadius:'999px', fontSize:'12px',
+    fontWeight:'600', marginBottom:'12px'
+  }}>
+    👨‍🍳 Community Recipe by {recipe.author?.split('@')[0]}
+  </div>
+)}
 
           {/* Quick stats */}
           <div style={{display:'flex', gap:'24px', margin:'16px 0', flexWrap:'wrap'}}>
@@ -94,6 +106,25 @@ export default function RecipePage() {
               <p style={{fontSize:'12px', color:'#888'}}>ingredients</p>
             </div>
           </div>
+  <button
+    onClick={async () => {
+       if (saved) {
+         await unsaveRecipe(user.email, parseInt(id))
+         setSaved(false)
+        } else {
+      await saveRecipe(user.email, parseInt(id))
+       setSaved(true)
+    }
+  }}
+  style={{
+    marginTop:'16px', background: saved ? '#fef2f2' : '#f97316',
+    color: saved ? '#dc2626' : 'white', border:'none',
+    padding:'10px 24px', borderRadius:'10px', fontSize:'14px',
+    fontWeight:'600', cursor:'pointer'
+  }}
+>
+  {saved ? '❤️ Saved' : '🤍 Save Recipe'}
+</button>
 
           {/* Description */}
           {recipe.description && (

@@ -23,15 +23,24 @@ export default function LoginPage() {
     }
 
     if (isLogin) {
-      const users = JSON.parse(localStorage.getItem('fm_users') || '[]')
-      const user = users.find(u => u.email === form.email && u.password === form.password)
-      if (!user) {
-        setError('Invalid email or password.')
-        return
-      }
-      localStorage.setItem('fm_current_user', JSON.stringify(user))
-      setUser(user)
-      navigate('/home')
+      // Check for admin
+if (form.email === 'admin@flavormind.com' && form.password === 'admin123') {
+  const adminUser = { id: 'admin', name: 'Admin', email: 'admin@flavormind.com', role: 'admin' }
+  localStorage.setItem('fm_current_user', JSON.stringify(adminUser))
+  setUser(adminUser)
+  navigate('/admin')
+  return
+}
+
+const users = JSON.parse(localStorage.getItem('fm_users') || '[]')
+const user = users.find(u => u.email === form.email && u.password === form.password)
+if (!user) {
+  setError('Invalid email or password.')
+  return
+}
+localStorage.setItem('fm_current_user', JSON.stringify(user))
+setUser(user)
+navigate('/home')
     } else {
       const users = JSON.parse(localStorage.getItem('fm_users') || '[]')
       const exists = users.find(u => u.email === form.email)
